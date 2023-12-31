@@ -1,19 +1,20 @@
 from algoviz.svg import Rect, Image, Text
 
-class Grafik():
+
+class Grafik:
 
     def __init__(self, view):
         self._game_view = view
         self._background = Image("./lsg/media/game_background.png", 0, 0, 977, 512, self._game_view)
         self._game_board = Rect(250, 31, 720, 450, self._game_view)
-        self._game_board.set_fill_rgb(0,0,0,0)
-        self._game_board.set_color_rgb(0,0,0,0)
+        self._game_board.set_fill_rgb(0, 0, 0, 0)
+        self._game_board.set_color_rgb(0, 0, 0, 0)
         self._game_rows = self.draw_game_rows()
-        self._game_score = Text(250, 20,f"You have to kill 25 more zombies to win the Game",
+        self._game_score = Text(250, 20, f"You have to kill 25 more zombies to win the Game",
                                 self._game_view)
-        self._plant_cooldown = Text(0, 20,f" Plantcooldown: 0", self._game_view)
+        self._plant_cooldown = Text(0, 20, f" Plantcooldown: 0", self._game_view)
 
-    def draw_game_rows(self, rows = 5):
+    def draw_game_rows(self, rows=5):
         """Erstellt die quadratischen Spielfelder"""
         game_rows = []
         x = self._game_board.get_x()
@@ -21,8 +22,8 @@ class Grafik():
         for row in range(rows):
             game_row = []
             for column in range(8):
-                new_column = Rect(x + column*90, y + row*90, 90, 90, self._game_view)
-                new_column.set_color_rgb(0,0,0,0)
+                new_column = Rect(x + column * 90, y + row * 90, 90, 90, self._game_view)
+                new_column.set_color_rgb(0, 0, 0, 0)
                 if (row + column) % 2 != 0:
                     new_column.set_fill("#76f855")
                 else:

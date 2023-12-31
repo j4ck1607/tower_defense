@@ -1,9 +1,10 @@
 from algoviz import AlgoViz
-from algoviz.svg import SVGView, Image, Rect, Text
+from algoviz.svg import SVGView, Text
 from lsg.zombie import Zombie
 from random import seed, randrange
 from lsg.plant import Plant
 from lsg.menue import Game_menue
+from lsg.graphics import Grafik
 
 class Game:
     
@@ -12,11 +13,8 @@ class Game:
         AlgoViz.clear()
         seed()
         self._game_view = SVGView(977, 512, "Plants vs Zombies")
-        self._background = Image("./lsg/media/game_background.png", 0, 0, 977, 512, self._game_view)
-        self._game_board = Rect(250, 31, 720, 450, self._game_view)
-        self._game_board.set_fill_rgb(0,0,0,0)
-        self._game_board.set_color_rgb(0,0,0,0)
-        self._game_rows = self.draw_game_rows()
+        self._grafik = Grafik(self._game_view)
+        self._game_rows = self._grafik.get_game_rows()
         self._zombies = [[], [], [], [], []]
         self._plants = self.create_plant_list()
         self._zombie_timer = 50
@@ -26,8 +24,7 @@ class Game:
         self._key = ""
         self._spawned_zombies = 0
         self._zombies_for_win = 25
-        self._game_score = Text(250, 20,f"You have to kill {self._zombies_for_win} more zombies to win the Game",  self._game_view)
-        self._plant_cooldown = Text(0, 20,f" Plantcooldown: {int(Plant.cooldown/10)}", self._game_view)
+
         # Debug variablen
     
     def start_game(self):
@@ -42,7 +39,6 @@ class Game:
                 self._killed_all_zombies = True
             elif self.zombie_reached_target():
                 self._game_over = True
-            self.update_game_score()
             if self._key == "Escape":
                 self.pause_game()
             AlgoViz.sleep(1)
@@ -61,24 +57,6 @@ class Game:
                 plant_rows.append(None)
             plants.append(plant_rows)
         return plants
-    
-    def draw_game_rows(self, rows = 5):
-        """Erstellt die quadratischen Spielfelder"""
-        game_rows = []
-        x = self._game_board.get_x()
-        y = self._game_board.get_y()
-        for row in range(rows):
-            game_row = []
-            for column in range(8):
-                new_column = Rect(x + column*90, y + row*90, 90, 90, self._game_view)
-                new_column.set_color_rgb(0,0,0,0)
-                if (row + column) % 2 != 0:
-                    new_column.set_fill("#76f855")
-                else:
-                    new_column.set_fill("#58de35")
-                game_row.append(new_column)
-            game_rows.append(game_row)
-        return game_rows
     
     def spawn_zombie(self, spawning_zombies):
         """Erstellt einen neuen Zombie und hängt diesen der Liste an"""
@@ -113,9 +91,7 @@ class Game:
                 AlgoViz.sleep(1)
                 
     def control_plants(self):
-        if Plant.cooldown > 0:
-            Plant.cooldown -= 1
-        self._plant_cooldown = Text(0, 20,f" Plantcooldown: {int(Plant.cooldown/10)}", self._game_view)
+        self.update_plant_cooldown()
         for i in range(len(self._plants)):
             for plant in self._plants[i]:
                 if plant != None:
@@ -145,7 +121,7 @@ class Game:
         if column != None and row != None and self._plants[row][column] == None and Plant.cooldown <= 0:
             new_plant = Plant(column, row, self._game_view)
             self._plants[row][column] = new_plant
-            Plant.cooldown = 150
+            Plant.cooldown = 151
             
     def collision_shot_zombie(self):
         """Kontrolliert ob von jeder Pflanze die Schüsse mit einem Zombie in der Linie Kollidieren.
@@ -174,6 +150,7 @@ class Game:
                         if hp_left <= 0:
                             del self._zombies[row][0]
                             self._zombies_for_win -= 1
+                            self._grafik.set_game_score(self._zombies_for_win)
                     AlgoViz.sleep(1)
                     
     def zombie_attack(self, zombie, row, column):
@@ -225,17 +202,18 @@ class Game:
         for i in range(len(self._zombies)):
             for zombie in self._zombies[i]:
                 x = zombie.get_x()
-                target_x = self._game_board.get_x()
+                target_x = 250
                 if x <= target_x:
                     return True
                 AlgoViz.sleep(1)
         else:
             return False
         
-    def update_game_score(self):
-        self._game_score.set_text(f"You have to kill {self._zombies_for_win} more zombie/s to win the Game")
-
-if __name__ == "__main__":
-    spiel = Game()
-    Game.start_game()
-
+    def update_plant_cooldown(self):
+        if Plant.cooldown > 0:
+            Plant.cooldown -= 1
+        elif Plant.cooldown == 0:
+            self._grafik.set_plant_cooldown(0)
+            Plant.cooldown = -1
+        if Plant.cooldown % 10 == 0:
+            self._grafik.set_plant_cooldown(int(Plant.cooldown)//10)

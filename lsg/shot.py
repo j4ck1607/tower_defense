@@ -4,7 +4,7 @@ from algoviz.svg import Circle
 class Shot:
 
     def __init__(self, column, row, view):
-        self._speed = 5
+        self._speed = 10
         self._x = column * 90 + 80 + 250
         self._y = row * 90 + 30 + 31
         self._color = "#93cf2f"

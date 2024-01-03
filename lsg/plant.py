@@ -30,8 +30,8 @@ class Plant:
     def set_hp(self, new_hp):
         self._hp = new_hp
 
-    def shoot(self):
-        if self._shot_timer <= 0:
+    def shoot(self, zombies):
+        if self._shot_timer <= 0 and (len(zombies) > 0):
             new_shot = Shot(self._column, self._row, self._view)
             self._shots.append(new_shot)
             self._shot_timer = 45

@@ -1,4 +1,4 @@
-from algoviz.svg import Rect, Image, Text
+from algoviz.svg import Rect, Image, Text, SVGView
 
 
 class Grafik:
@@ -36,8 +36,13 @@ class Grafik:
         return self._game_rows
 
     def set_game_score(self, score):
-        self._game_score = Text(250, 20, f"You have to kill {score} more zombies to win the Game",
+        if score >= 0:
+            self._game_score = Text(250, 20, f"You have to kill {score} more zombies to win the Game",
                                 self._game_view)
+        else:
+            self._game_score = Text(250, 20, f"You have to kill the remaining zombies to win the Game",
+                                    self._game_view)
 
     def set_plant_cooldown(self, cooldown):
         self._plant_cooldown = Text(0, 20, f" Plantcooldown: {cooldown}", self._game_view)
+

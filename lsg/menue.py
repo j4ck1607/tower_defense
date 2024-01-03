@@ -1,4 +1,4 @@
-from algoviz.svg import SVGView, Rect, Image, Text
+from algoviz.svg import Rect, Image, Text
 
 
 class GameMenue:
@@ -9,41 +9,34 @@ class GameMenue:
         self._resume_cords = (300, 100)
         self._exit_cords = (300, 150)
         self._rect = Rect(self._rect_cords[0], self._rect_cords[1], self._rect_cords[2], self._rect_cords[3], view)
-        self._resume = Text(self._resume_cords[0], self._resume_cords[1], "Resume Game", view)
-        self._exit = Text(self._exit_cords[0], self._exit_cords[1], "Exit Game", view)
+        self._resume = Rect(self._resume_cords[0], self._resume_cords[1], 200, 50, view)
+        self._exit = Rect(self._exit_cords[0], self._exit_cords[1], 200, 50, view)
+        self._resume.set_fill("green")
+        self._exit.set_fill("red")
         self._rect.set_fill_rgb(72, 38, 13, 0.95)
-        self._view.wait_for_click()
+        self._button = self.pause_loop()
 
-    def still_paused(self):
-        resume = self.clicked_resume()
-        if resume:
-            return False
-        else:
-            return True
-
-    def game_exit(self):
-        clicked_exit = self.clicked_exit()
-        if clicked_exit:
-            return True
-        else:
-            return False
-
-    def clicked_exit(self):
-        last_click = self._view.last_click()
-        x = last_click.x()
-        y = last_click.y()
-        if self._exit_cords[0] <= x <= (self._exit_cords[0] + 200) and self._exit_cords[1] <= y <= (
-                self._exit_cords[1] + 50):
-            return True
-        else:
-            return False
-
-    def clicked_resume(self):
-        last_click = self._view.last_click()
+    def check_click(self, last_click):
         x = last_click.x()
         y = last_click.y()
         if self._resume_cords[0] <= x <= (self._resume_cords[0] + 200) and self._resume_cords[1] <= y <= (
                 self._resume_cords[1] + 50):
-            return True
+            return "resume"
+        elif self._exit_cords[0] <= x <= (self._exit_cords[0] + 200) and self._exit_cords[1] <= y <= (
+                    self._exit_cords[1] + 50):
+            return "exit"
         else:
-            return False
+            return "pause"
+
+    def pause_loop(self):
+        last_click = self._view.last_click()
+        key = self._view.last_key()
+        clicked_button = self.check_click(last_click)
+        while clicked_button != "resume" and clicked_button != "exit" and key != "Escape":
+            last_click = self._view.last_click()
+            key = self._view.last_key()
+            clicked_button = self.check_click(last_click)
+        return clicked_button
+
+    def get_button(self):
+        return self._button

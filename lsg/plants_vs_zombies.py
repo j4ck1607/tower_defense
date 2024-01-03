@@ -19,14 +19,13 @@ class Game:
         self._zombies = [[], [], [], [], []]
         self._plants = self.create_plant_list()
         self._zombie_timer = 50
-        self._zombie_amount = 0
+        self._zombie_amount = 1
         self._game_over = False
         self._killed_all_zombies = False
         self._key = ""
         self._spawned_zombies = 0
         self._zombies_for_win = 25
-
-        # Debug variablen
+        Plant.cooldown = 0
 
     def start_game(self):
         """Game loop"""
@@ -49,7 +48,7 @@ class Game:
             print("Gewonnen! Du hast alle Zombies getötet!")
 
     def create_plant_list(self):
-        """Erstellt eine Liste zum verwalten der Pflanzen auf den Felder, und belegt diese mit None vor
+        """Erstellt eine Liste zum verwalten der Pflanzen auf den Feldern, und belegt diese mit None vor
         """
         plants = []
         for i in range(len(self._game_rows)):
@@ -62,6 +61,8 @@ class Game:
     def spawn_zombie(self, spawning_zombies):
         """Erstellt einen neuen Zombie und hängt diesen der Liste an"""
         self._spawned_zombies += 1
+        if self._spawned_zombies % 5 == 0:
+            self._zombie_amount += 1
         seed()
         row = randrange(0, 5)
         pos = len(spawning_zombies[row]) + 1
@@ -73,8 +74,6 @@ class Game:
     def control_zombies(self):
         """Erschafft ggf. neue Zombies und bewegt alle existierenden vorwärts"""
         if self._zombie_timer <= 0 < self._zombies_for_win:
-            if self._spawned_zombies % 5 == 0:
-                self._zombie_amount += 1
             spawning_zombies = [[], [], [], [], []]
             for i in range(self._zombie_amount):
                 row = self.spawn_zombie(spawning_zombies)
@@ -93,10 +92,10 @@ class Game:
 
     def control_plants(self):
         self.update_plant_cooldown()
-        for i in range(len(self._plants)):
-            for plant in self._plants[i]:
+        for row in range(len(self._plants)):
+            for plant in self._plants[row]:
                 if plant is not None:
-                    plant.shoot()
+                    plant.shoot(self._zombies[row])
 
     def check_clicked_array(self):
         """Schaut, ob die zuletzt geklickte Position auf dem Spielfeld war,
@@ -143,7 +142,7 @@ class Game:
                     AlgoViz.sleep(1)
 
     def zombie_attack(self, zombie, row, column):
-        """Die attackierte Pflanze wird der Schaden abgezogen, und falls die HP danach <= 0 sind
+        """Die attackierte Pflanze wird der Schaden abgezogen, und falls die HP danach ≤ 0 sind
         wird die Pflanze gelöscht und die Position in der Liste mit None belegt
         """
         attack_timer = zombie.get_attack_timer()
@@ -160,14 +159,10 @@ class Game:
             zombie.set_attack_timer(attack_timer)
 
     def pause_game(self):
-        game_paused = True
-        menue = Game_menue(self._game_view)
-        while game_paused:
-            if not menue.still_paused():
-                game_paused = False
-            if menue.game_exit():
-                self._game_over = True
-                game_paused = False
+        menue = GameMenue(self._game_view)
+        button = menue.get_button()
+        if button == "exit":
+            self._game_over = True
         del menue
 
     def all_zombies_killed(self):
@@ -184,7 +179,7 @@ class Game:
             return False
 
     def zombie_reached_target(self):
-        """Gibt True zurück wenn mindestens ein Zombie am linken Spielfeld angekommen sind
+        """Gibt True zurück, wenn mindestens ein Zombie am linken Spielfeld angekommen sind
         --> sonst False
         """
         for i in range(len(self._zombies)):

@@ -6,7 +6,7 @@ class Shot:
     def __init__(self, column, row, view):
         self._speed = 10
         self._x = column * 90 + 80 + 250
-        self._y = row * 90 + 30 + 31
+        self._y = row * 90 + 30 + 45
         self._color = "#93cf2f"
         self._image = Circle(self._x, self._y, 5, view)
         self._image.set_fill(self._color)

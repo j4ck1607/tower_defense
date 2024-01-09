@@ -1,10 +1,8 @@
-from algoviz.svg import Image, Rect
-from lsg.shot import Shot
+from lsg.plant.shot.shot import Shot
 from algoviz import AlgoViz
 
 
 class Plant:
-    cooldown = 0
 
     def __init__(self, column, row, view):
         self._x = column * 90 + 250
@@ -12,7 +10,6 @@ class Plant:
         self._column = column
         self._row = row
         self._view = view
-        self._image = Image("./lsg/media/plant01.png", self._x, self._y, 90, 90, view)
         self._shots = []
         self._shot_timer = 45
         self._dmg = 25

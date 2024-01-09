@@ -1,4 +1,4 @@
-from algoviz.svg import Rect, Image, Text, SVGView
+from algoviz.svg import Rect, Image, Text
 
 
 class Grafik:
@@ -12,7 +12,12 @@ class Grafik:
         self._game_rows = self.draw_game_rows()
         self._game_score = Text(250, 20, f"You have to kill 25 more zombies to win the Game",
                                 self._game_view)
-        self._plant_cooldown = Text(0, 20, f" Plantcooldown: 0", self._game_view)
+        self._plant_cooldowns = self.visual_cooldown()
+        self._cooldowns = [None, None, None]
+        self._plant_cooldowns_text = [None, None, None]
+        for i in range(1, 3):
+            self.cooldown_animation(i)
+        self.select_plant(3)
 
     def draw_game_rows(self, rows=5):
         """Erstellt die quadratischen Spielfelder"""
@@ -43,6 +48,31 @@ class Grafik:
             self._game_score = Text(250, 20, f"You have to kill the remaining zombies to win the Game",
                                     self._game_view)
 
-    def set_plant_cooldown(self, cooldown):
-        self._plant_cooldown = Text(0, 20, f" Plantcooldown: {cooldown}", self._game_view)
+    def visual_cooldown(self):
+        rects = []
+        for i in range(4):
+            new_rect = Rect(10, i * 50 + 10, 45, 45, self._game_view)
+            new_rect.set_fill_rgb(255, 255, 255)
+            rects.append(new_rect)
+        basic_cooldown = Image("./lsg/media/basic_plant.png", 10, 10, 45, 45, self._game_view)
+        speed_cooldown = Image("./lsg/media/speed_plant.png", 10, 60, 45, 45, self._game_view)
+        canon_cooldown = Image("./lsg/media/canon_plant.png", 10, 110, 45, 45, self._game_view)
+        nothing = Image("./lsg/media/red_cross.png", 10, 160, 45, 45, self._game_view)
+        return basic_cooldown, speed_cooldown, canon_cooldown, nothing, rects
+
+    def cooldown_animation(self, idx):
+        new_rect = Rect(10, idx * 50 + 10, 45, 45, self._game_view)
+        new_rect.set_fill_rgb(100, 100, 100, 0.7)
+        self._cooldowns[idx] = new_rect
+
+    def cooldown_over(self, idx):
+        self._cooldowns[idx] = None
+
+    def set_plant_cooldown(self, cooldown, idx):
+        self._plant_cooldowns_text[idx] = Text(60, idx * 50 + 30, f"{cooldown}", self._game_view)
+
+    def select_plant(self, idx):
+        for cd in self._plant_cooldowns[4]:
+            cd.set_color_rgb(255, 255, 255)
+        self._plant_cooldowns[4][idx].set_color_rgb(255, 0, 0)
 

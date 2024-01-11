@@ -13,9 +13,15 @@ class Zombie:
         self._dmg = 40
         self._image = Image("./lsg/media/zombie.png", self._x, self._y, 90, 90, view)
         self._attack_timer = 10
+        self._moving = True
 
     def move(self):
-        self._x -= self._speed
+        if self._moving:
+            self._x -= self._speed
+            self._image.move_to(self._x, self._y)
+
+    def move_to(self, x):
+        self._x = x
         self._image.move_to(self._x, self._y)
 
     def hit(self, dmg):
@@ -51,3 +57,6 @@ class Zombie:
 
     def set_attack_timer(self, new_timer):
         self._attack_timer = new_timer
+
+    def set_moving(self, boolean):
+        self._moving = boolean

@@ -7,10 +7,15 @@ from lsg.graphics import Grafik
 from lsg.plant.basic_plant import BasicPlant
 from lsg.plant.canon_plant import CanonPlant
 from lsg.plant.speed_plant import SpeedPlant
-from lsg.hit_animation import HitAnimation
+from lsg.animations.hit_animation import HitAnimation
 
 
 class Game:
+    """
+    TO-Dos:
+    zombies vor der Knockback animation sterben lassen
+
+    """
 
     def __init__(self):
         """Erstellt ein neues Plants vs Zombies spiel"""
@@ -34,7 +39,6 @@ class Game:
         self._last_click = self._game_view.last_click()
         self._animations = []
 
-
     def start_game(self):
         """Game loop"""
         while not self._game_over and not self._killed_all_zombies:
@@ -43,6 +47,7 @@ class Game:
             self.control_zombies()
             self.control_plants()
             self.collision_shot_zombie()
+            AlgoViz.sleep(1)
             self.plant_plant()
             self.animations()
             if self.all_zombies_killed():
@@ -78,11 +83,12 @@ class Game:
         pos = len(spawning_zombies[row]) + 1
         new_zombie = Zombie(row, pos, self._game_view)
         self._zombies[row].append(new_zombie)
-        AlgoViz.sleep(1)
+        #AlgoViz.sleep(1)
         return row
 
     def control_zombies(self):
         """Erschafft ggf. neue Zombies und bewegt alle existierenden vorwärts"""
+        self.sort_zombies()
         if self._zombie_timer <= 0 < self._zombies_for_win:
             spawning_zombies = [[], [], [], [], []]
             for i in range(self._zombie_amount):
@@ -154,7 +160,6 @@ class Game:
               and self._plants[row][column] is not None and self._current_plant == 3):
             self._plants[row][column] = None
 
-
     def collision_shot_zombie(self):
         """Kontrolliert, ob von jeder Pflanze die Schüsse mit einem Zombie in der Linie Kollidieren.
         Falls ja, wird dem Zombie der Schaden angerechnet, und der Zombie wird gelöscht, wenn er unter
@@ -168,11 +173,15 @@ class Game:
                         dmg = plant.get_dmg()
                         hp_left = self._zombies[row][0].hit(dmg)
                         self._animations.append(HitAnimation(x, row, self._game_view, 255, 0))
+                        if plant.has_effect():
+                            effect = plant.effect(self._zombies[row][0])
+                            if effect[0]:
+                                self._animations.append(effect[1])
                         if hp_left <= 0:
                             del self._zombies[row][0]
                             self._zombies_for_win -= 1
                             self._grafik.set_game_score(self._zombies_for_win)
-                    AlgoViz.sleep(1)
+                AlgoViz.sleep(1)
 
     def zombie_attack(self, zombie, row, column):
         """Die attackierte Pflanze wird der Schaden abgezogen, und falls die HP danach ≤ 0 sind
@@ -260,11 +269,27 @@ class Game:
             pass
 
     def animations(self):
-        for idx in range(len(self._animations)):
-            try:
-                self._animations[idx].animate()
-                if self._animations[idx].get_lifetime() <= 0:
-                    del self._animations[idx]
-            except:
-                pass
-            AlgoViz.sleep(2)
+        for animation in self._animations:
+            animation.animate()
+            if animation.get_lifetime() <= 0:
+                self._animations.remove(animation)
+            AlgoViz.sleep(1)
+
+    def sort_zombies(self):
+        for row in range(len(self._zombies)):
+            if len(self._zombies[row]) > 1:
+                first_x = 1000
+                first_zombie = None
+                index = None
+                for idx in range(len(self._zombies[row])):
+                    x = self._zombies[row][idx].get_x()
+                    if x < first_x:
+                        first_x = x
+                        first_zombie = self._zombies[row][idx]
+                        index = idx
+                current_first = self._zombies[row][0]
+                if current_first != first_zombie and first_zombie is not None:
+                    self._zombies[row][0] = first_zombie
+                    self._zombies[row][index] = current_first
+            AlgoViz.sleep(1)
+

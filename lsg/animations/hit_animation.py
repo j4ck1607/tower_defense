@@ -1,18 +1,19 @@
 from random import seed, randint
 from algoviz.svg import Circle
+from lsg.animations.animation import Animation
+from algoviz import AlgoViz
 
 
-class HitAnimation:
+class HitAnimation(Animation):
 
     def __init__(self, x, line, view, red, green):
+        super().__init__(view)
+        self._x = x
         self._red = red
         self._green = green
-        self._x = x
         self._y = line * 90 + 76
-        self._view = view
         self._group = []
         self.create_circles()
-        self._lifetime = 1.0
 
     def create_circles(self):
         seed()
@@ -29,7 +30,7 @@ class HitAnimation:
         self._lifetime -= 0.1
         for circle in self._group:
             circle.set_fill_rgb(self._red*self._lifetime, self._green*self._lifetime, 0, self._lifetime)
-
+            AlgoViz.sleep(1)
 
     def get_lifetime(self):
         return self._lifetime

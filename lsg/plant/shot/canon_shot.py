@@ -9,5 +9,4 @@ class CanonShot(Shot):
         self._color = "Yellow"
         self._image = Circle(self._x, self._y, 10, view)
         self._image.set_fill(self._color)
-        self._image.set_color(self._color)
         self._speed = 30

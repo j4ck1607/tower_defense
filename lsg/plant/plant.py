@@ -14,6 +14,7 @@ class Plant:
         self._shot_timer = 45
         self._dmg = 25
         self._hp = 100
+        self._effect = False
 
     def get_dmg(self):
         return self._dmg
@@ -52,3 +53,9 @@ class Plant:
                 return False
         except:
             return False
+
+    def has_effect(self):
+        return self._effect
+
+    def effect(self, zombie):
+        return False

@@ -5,8 +5,8 @@ from lsg.animations.knockback_animation import KnockbackAnimation
 
 
 class CanonPlant(Plant):
-    shot_timer = 120
-    cooldown = 60
+    shot_timer = 80
+    cooldown = 600
     def __init__(self, column, row, view):
         super().__init__(column, row, view)
         self._image = Image("./lsg/media/canon_plant.png", self._x, self._y, 90, 90, view)

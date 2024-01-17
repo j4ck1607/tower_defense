@@ -4,7 +4,8 @@ from lsg.plant.shot.basic_shot import BasicShot
 
 
 class BasicPlant(Plant):
-    cooldown = 20
+    shot_timer = 45
+    cooldown = 200
 
     def __init__(self, column, row, view):
         super().__init__(column, row, view)

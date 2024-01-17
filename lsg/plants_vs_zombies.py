@@ -1,6 +1,5 @@
 from algoviz import AlgoViz
 from algoviz.svg import SVGView
-from lsg.zombie.zombie import Zombie
 from random import seed, randrange
 from lsg.menue import GameMenue
 from lsg.graphics import Grafik
@@ -8,17 +7,17 @@ from lsg.plant.basic_plant import BasicPlant
 from lsg.plant.canon_plant import CanonPlant
 from lsg.plant.speed_plant import SpeedPlant
 from lsg.animations.hit_animation import HitAnimation
+from lsg.zombie.basic_zombie import BasicZombie
+from lsg.zombie.flamethrower_zombie import FlamethrowerZombie
 
 
 class Game:
-    """
-    TO-Dos:
-    zombies vor der Knockback animation sterben lassen
-
+    """Die Klasse Game ist die Hauptklasse des Spiels. Sie verwaltet alle Objekte und startet den Game Loop.
+    Sie enthält alle Funktionen, die für das Spiel benötigt werden.
     """
 
     def __init__(self):
-        """Erstellt ein neues Plants vs Zombies spiel"""
+        """Erstellt alle benötigten Variablen und Objekte für das Spiel"""
         AlgoViz.clear()
         seed()
         self._game_view = SVGView(977, 512, "Plants vs Zombies")
@@ -32,15 +31,16 @@ class Game:
         self._killed_all_zombies = False
         self._key = ""
         self._spawned_zombies = 0
-        self._zombies_for_win = 25
+        self._zombies_for_win = 1
         self._plant_cooldowns = [0, SpeedPlant.cooldown, CanonPlant.cooldown]
+        self._zombie_attack_cooldown = [BasicZombie.attack_timer, FlamethrowerZombie.attack_timer]
         self._plant_cooldown_text = [None, None, None]
         self._current_plant = 3
         self._last_click = self._game_view.last_click()
         self._animations = []
 
     def start_game(self):
-        """Game loop"""
+        """Startet den Game Loop, und beendet diesen, wenn das Spiel gewonnen oder verloren wurde"""
         while not self._game_over and not self._killed_all_zombies:
             self._key = self._game_view.last_key()
             self.update_graphics()
@@ -57,14 +57,15 @@ class Game:
             if self._key == "Escape":
                 self.pause_game()
             AlgoViz.sleep(1)
+        self.delete_shots()
+        self.delete_animation()
         if self._game_over:
             print("Verloren! Die Zombies haben dich erreicht!")
         elif self._killed_all_zombies:
             print("Gewonnen! Du hast alle Zombies getötet!")
 
     def create_plant_list(self):
-        """Erstellt eine Liste zum verwalten der Pflanzen auf den Feldern, und belegt diese mit None vor
-        """
+        """Erstellt eine Liste mit 5 Listen, die jeweils 8 mal None enthalten"""
         plants = []
         for i in range(len(self._game_rows)):
             plant_rows = []
@@ -73,26 +74,31 @@ class Game:
             plants.append(plant_rows)
         return plants
 
-    def spawn_zombie(self, spawning_zombies):
-        """Erstellt einen neuen Zombie und hängt diesen der Liste an"""
+    def spawn_zombie(self, zombie, spawning_zombies):
+        """Erstellt einen neuen Zombie und fügt ihn der Liste mit den Zombies hinzu"""
         self._spawned_zombies += 1
         if self._spawned_zombies % 5 == 0:
             self._zombie_amount += 1
         seed()
         row = randrange(0, 5)
         pos = len(spawning_zombies[row]) + 1
-        new_zombie = Zombie(row, pos, self._game_view)
+        new_zombie = zombie(row, pos, self._game_view)
         self._zombies[row].append(new_zombie)
-        #AlgoViz.sleep(1)
         return row
 
     def control_zombies(self):
-        """Erschafft ggf. neue Zombies und bewegt alle existierenden vorwärts"""
+        """Kontrolliert, ob ein neuer Zombie gespawnt werden soll, und ob ein Zombie eine Pflanze angreift
+        oder sich bewegt"""
         self.sort_zombies()
         if self._zombie_timer <= 0 < self._zombies_for_win:
             spawning_zombies = [[], [], [], [], []]
+            # BasicZombie
             for i in range(self._zombie_amount):
-                row = self.spawn_zombie(spawning_zombies)
+                row = self.spawn_zombie(BasicZombie, spawning_zombies)
+                spawning_zombies[row].append(len(spawning_zombies[row]) + 1)
+            # FlamethrowerZombie
+            for i in range(self._zombie_amount-1):
+                row = self.spawn_zombie(FlamethrowerZombie, spawning_zombies)
                 spawning_zombies[row].append(len(spawning_zombies[row]) + 1)
             self._zombie_timer = 200
         else:
@@ -107,6 +113,7 @@ class Game:
                 AlgoViz.sleep(1)
 
     def control_plants(self):
+        # schreibe hier den docstring der Funktion control_plants
         self.update_plant_cooldowns()
         for row in range(len(self._plants)):
             for plant in self._plants[row]:
@@ -114,9 +121,8 @@ class Game:
                     plant.shoot(self._zombies[row])
 
     def check_clicked_array(self):
-        """Schaut, ob die zuletzt geklickte Position auf dem Spielfeld war,
-        und gibt dann die Reihe und Spalte zurück --> sonst None, None
-        """
+        """Gibt die Spalte und Reihe zurück, in der der Spieler zuletzt geklickt hat, wenn er auf ein Spielfeld
+        geklickt hat, sonst None, None"""
         last_click = self._game_view.last_click()
         x = last_click.x()
         y = last_click.y()
@@ -144,17 +150,17 @@ class Game:
             if self._plant_cooldowns[0] <= 0 and self._current_plant == 0:
                 new_plant = BasicPlant(column, row, self._game_view)
                 self._plants[row][column] = new_plant
-                self._plant_cooldowns[0] = BasicPlant.cooldown +1
+                self._plant_cooldowns[0] = BasicPlant.cooldown + 1
                 self._grafik.cooldown_animation(0)
             elif self._plant_cooldowns[1] <= 0 and self._current_plant == 1:
                 new_plant = SpeedPlant(column, row, self._game_view)
                 self._plants[row][column] = new_plant
-                self._plant_cooldowns[1] = SpeedPlant.cooldown+1
+                self._plant_cooldowns[1] = SpeedPlant.cooldown + 1
                 self._grafik.cooldown_animation(1)
             elif self._plant_cooldowns[2] <= 0 and self._current_plant == 2:
                 new_plant = CanonPlant(column, row, self._game_view)
                 self._plants[row][column] = new_plant
-                self._plant_cooldowns[2] = CanonPlant.cooldown+1
+                self._plant_cooldowns[2] = CanonPlant.cooldown + 1
                 self._grafik.cooldown_animation(2)
         elif (column is not None and row is not None
               and self._plants[row][column] is not None and self._current_plant == 3):
@@ -189,6 +195,8 @@ class Game:
         """
         attack_timer = zombie.get_attack_timer()
         if attack_timer <= 0:
+            idx = zombie.get_index()
+            zombie.set_attack_timer(self._zombie_attack_cooldown[idx])
             dmg = zombie.get_dmg()
             hp = self._plants[row][column].get_hp()
             hp -= dmg
@@ -237,6 +245,7 @@ class Game:
             return False
 
     def update_plant_cooldowns(self):
+        """Aktualisiert die Cooldowns der Pflanzen, und setzt diese in der Grafik neu"""
         for idx in range(len(self._plant_cooldowns)):
             if self._plant_cooldowns[idx] > 0:
                 self._plant_cooldowns[idx] -= 1
@@ -261,7 +270,7 @@ class Game:
     def update_graphics(self):
         try:
             if 1 <= int(self._key) <= 4:
-                key = int(self._key) -1
+                key = int(self._key) - 1
                 if key != self._current_plant:
                     self._current_plant = key
                     self._grafik.select_plant(self._current_plant)
@@ -276,6 +285,8 @@ class Game:
             AlgoViz.sleep(1)
 
     def sort_zombies(self):
+        """Sortiert die Zombies in den Reihen nach ihrer x-Position, damit der Zombie, der am weitesten
+        links ist, auch als erstes in der Liste steht, und somit auch als erstes angegriffen wird."""
         for row in range(len(self._zombies)):
             if len(self._zombies[row]) > 1:
                 first_x = 1000
@@ -293,3 +304,16 @@ class Game:
                     self._zombies[row][index] = current_first
             AlgoViz.sleep(1)
 
+    def delete_shots(self):
+        """Löscht alle Schüsse, die sich noch im Spiel befinden"""
+        for row in range(len(self._plants)):
+            for plant in self._plants[row]:
+                if plant is not None:
+                    plant.delete_shots()
+                    AlgoViz.sleep(1)
+
+    def delete_animation(self):
+        """Löscht alle Animationen, die sich noch im Spiel befinden"""
+        for animation in self._animations:
+            self._animations.remove(animation)
+            AlgoViz.sleep(1)

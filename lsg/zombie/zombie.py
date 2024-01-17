@@ -1,5 +1,4 @@
-from algoviz.svg import Image
-
+from algoviz.svg import Group
 
 class Zombie:
 
@@ -11,9 +10,9 @@ class Zombie:
         self._hp = 100
         self._speed = 2
         self._dmg = 40
-        self._image = Image("./lsg/media/zombie.png", self._x, self._y, 90, 90, view)
-        self._attack_timer = 10
+        self._attack_timer = 0
         self._moving = True
+        self._index = -1
 
     def move(self):
         if self._moving:
@@ -55,8 +54,11 @@ class Zombie:
     def get_attack_timer(self):
         return self._attack_timer
 
-    def set_attack_timer(self, new_timer):
-        self._attack_timer = new_timer
+    def set_attack_timer(self, new_attack_timer):
+        self._attack_timer = new_attack_timer
 
     def set_moving(self, boolean):
         self._moving = boolean
+
+    def get_index(self):
+        return self._index

@@ -2,8 +2,10 @@ from algoviz.svg import Rect, Image, Text
 
 
 class Grafik:
+    """Diese Klasse ist für die Grafik des Spiels zuständig"""
 
     def __init__(self, view):
+        """Erstellt die Grafik des Spiels"""
         self._game_view = view
         self._background = Image("./lsg/media/game_background.png", 0, 0, 977, 512, self._game_view)
         self._game_board = Rect(250, 31, 720, 450, self._game_view)
@@ -18,6 +20,7 @@ class Grafik:
         for i in range(1, 3):
             self.cooldown_animation(i)
         self.select_plant(3)
+        print("Press 1-4 to select the plants or the delete function.")
 
     def draw_game_rows(self, rows=5):
         """Erstellt die quadratischen Spielfelder"""
@@ -41,6 +44,7 @@ class Grafik:
         return self._game_rows
 
     def set_game_score(self, score):
+        """Setzt den Text der anzeigt wie viele Zombies noch getötet werden müssen"""
         if score >= 0:
             self._game_score = Text(250, 20, f"You have to kill {score} more zombies to win the Game",
                                 self._game_view)
@@ -49,6 +53,7 @@ class Grafik:
                                     self._game_view)
 
     def visual_cooldown(self):
+        """Erstellt die Grafik für die Cooldowns der Pflanzen"""
         rects = []
         for i in range(4):
             new_rect = Rect(10, i * 50 + 10, 45, 45, self._game_view)

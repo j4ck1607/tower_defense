@@ -59,3 +59,7 @@ class Plant:
 
     def effect(self, zombie):
         return False
+
+    def delete_shots(self):
+        for shot in self._shots:
+            self._shots.remove(shot)

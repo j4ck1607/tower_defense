@@ -5,7 +5,7 @@ from lsg.plant.shot.speed_shot import SpeedShot
 
 class SpeedPlant(Plant):
     shot_timer = 20
-    cooldown = 50
+    cooldown = 500
 
     def __init__(self, column, row, view):
         super().__init__(column, row, view)

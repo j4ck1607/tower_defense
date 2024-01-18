@@ -4,6 +4,7 @@ from lsg.plant.shot.speed_shot import SpeedShot
 
 
 class SpeedPlant(Plant):
+    """Die SpeedPlant, welche drei Schüsse abfeuern kann, und keine Speziellen Fähigkeiten hat."""
     shot_timer = 20
     cooldown = 500
 

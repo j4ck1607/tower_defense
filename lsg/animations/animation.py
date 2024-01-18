@@ -3,6 +3,7 @@ from algoviz.svg import Circle
 
 
 class Animation:
+    """Eltern Klasse für alle Animationen"""
 
     def __init__(self, view):
         self._view = view

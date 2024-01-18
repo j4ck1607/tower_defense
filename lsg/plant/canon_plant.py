@@ -5,6 +5,8 @@ from lsg.animations.knockback_animation import KnockbackAnimation
 
 
 class CanonPlant(Plant):
+    """Die CanonPlant, welche einen Schuss abfeuern kann, und Zombies zurückstößt.
+    Sie hat eine längere Abklingzeit als die BasicPlant."""
     shot_timer = 80
     cooldown = 600
     def __init__(self, column, row, view):

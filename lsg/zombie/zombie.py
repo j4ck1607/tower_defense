@@ -1,6 +1,8 @@
 from algoviz.svg import Group
 
 class Zombie:
+    """Die Eltern Klasse der Zombies. Diese Klasse wird von allen Zombies geerbt,
+    und wird nicht direkt aufgerufen."""
 
     def __init__(self, row, position, view):
         self._line = row
@@ -62,3 +64,9 @@ class Zombie:
 
     def get_index(self):
         return self._index
+
+    def is_dead(self):
+        if self._hp <= 0:
+            return True
+        else:
+            return False

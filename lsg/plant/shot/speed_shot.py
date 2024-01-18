@@ -2,6 +2,7 @@ from lsg.plant.shot.shot import Shot
 
 
 class SpeedShot(Shot):
+    """Klasse für die Schüsse von der SpeedPlant"""
 
     def __init__(self, x, y, column, row, view):
         super().__init__(column, row, view)

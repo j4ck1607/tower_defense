@@ -2,6 +2,7 @@ from algoviz.svg import Circle
 
 
 class Shot:
+    """Elternklasse für die Schüsse der Pflanzen"""
 
     def __init__(self, column, row, view):
         self._speed = 10

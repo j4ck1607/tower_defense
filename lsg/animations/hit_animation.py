@@ -5,6 +5,8 @@ from algoviz import AlgoViz
 
 
 class HitAnimation(Animation):
+    """Animation für einen Treffer, der auf dem Spielfeld angezeigt wird.
+    Besteht aus 4 Kreisen, die mit der Zeit verblassen."""
 
     def __init__(self, x, line, view, red, green):
         super().__init__(view)

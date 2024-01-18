@@ -4,6 +4,7 @@ from lsg.plant.shot.basic_shot import BasicShot
 
 
 class BasicPlant(Plant):
+    """Die BasicPlant, welche einen Schuss abfeuern kann. Und keine Speziellen Fähigkeiten hat."""
     shot_timer = 45
     cooldown = 200
 

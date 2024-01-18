@@ -3,6 +3,7 @@ from algoviz.svg import Image
 
 
 class FlamethrowerZombie(Zombie):
+    """Der FlamethrowerZombie, welcher einen Flammenwerfer hat, und schneller angreift, als der BasicZombie."""
     attack_timer = 3
 
     def __init__(self, row, position, view):

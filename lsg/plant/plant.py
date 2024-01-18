@@ -3,6 +3,7 @@ from algoviz import AlgoViz
 
 
 class Plant:
+    """Die Eltern Klasse aller Pflanzen. Diese Klasse wird nicht direkt aufgerufen werden."""
 
     def __init__(self, column, row, view):
         self._x = column * 90 + 250

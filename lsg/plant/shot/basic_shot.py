@@ -2,6 +2,7 @@ from lsg.plant.shot.shot import Shot
 
 
 class BasicShot(Shot):
+    """Schüsse, die von der BasicPlant abgefeuert werden."""
 
     def __init__(self, column, row, view):
         super().__init__(column, row, view)

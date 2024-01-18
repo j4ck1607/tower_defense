@@ -17,8 +17,6 @@ class Grafik:
         self._plant_cooldowns = self.visual_cooldown()
         self._cooldowns = [None, None, None]
         self._plant_cooldowns_text = [None, None, None]
-        for i in range(1, 3):
-            self.cooldown_animation(i)
         self.select_plant(3)
         print("Press 1-4 to select the plants or the delete function.")
 

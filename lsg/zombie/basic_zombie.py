@@ -3,6 +3,7 @@ from algoviz.svg import Image
 
 
 class BasicZombie(Zombie):
+    """Der normale Zombie, der keine Speziellen Fähigkeiten hat, und von Anfang an Spawnt."""
     attack_timer = 20
 
     def __init__(self, row, position, view):

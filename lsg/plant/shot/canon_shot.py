@@ -3,6 +3,7 @@ from algoviz.svg import Circle
 
 
 class CanonShot(Shot):
+    """Schüsse, die von der CanonPlant abgefeuert werden."""
 
     def __init__(self, column, row, view):
         super().__init__(column, row, view)

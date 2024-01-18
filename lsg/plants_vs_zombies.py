@@ -13,7 +13,6 @@ from lsg.zombie.flamethrower_zombie import FlamethrowerZombie
 
 class Game:
     """Die Klasse Game ist die Hauptklasse des Spiels. Sie verwaltet alle Objekte und startet den Game Loop.
-    Sie enthält alle Funktionen, die für das Spiel benötigt werden.
     """
 
     def __init__(self):
@@ -31,8 +30,9 @@ class Game:
         self._killed_all_zombies = False
         self._key = ""
         self._spawned_zombies = 0
-        self._zombies_for_win = 1
+        self._zombies_for_win = 25
         self._plant_cooldowns = [0, SpeedPlant.cooldown, CanonPlant.cooldown]
+        self.set_cooldown_animation()
         self._zombie_attack_cooldown = [BasicZombie.attack_timer, FlamethrowerZombie.attack_timer]
         self._plant_cooldown_text = [None, None, None]
         self._current_plant = 3
@@ -113,7 +113,6 @@ class Game:
                 AlgoViz.sleep(1)
 
     def control_plants(self):
-        # schreibe hier den docstring der Funktion control_plants
         self.update_plant_cooldowns()
         for row in range(len(self._plants)):
             for plant in self._plants[row]:
@@ -252,6 +251,7 @@ class Game:
             elif self._plant_cooldowns[idx] == 0:
                 self._grafik.cooldown_over(idx)
                 self._grafik.set_plant_cooldown(0, idx)
+                self._plant_cooldowns[idx] = -1
             if self._plant_cooldowns[idx] % 10 == 0:
                 self._grafik.set_plant_cooldown(int(self._plant_cooldowns[idx]) // 10, idx)
             AlgoViz.sleep(1)
@@ -317,3 +317,9 @@ class Game:
         for animation in self._animations:
             self._animations.remove(animation)
             AlgoViz.sleep(1)
+
+    def set_cooldown_animation(self):
+        """Setzt zu Beginn des Spieles die Animationen für die Cooldowns"""
+        for idx in range(len(self._plant_cooldowns)):
+            if self._plant_cooldowns[idx] > 0:
+                self._grafik.cooldown_animation(idx)
